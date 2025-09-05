@@ -1,4 +1,4 @@
-# Swiss Testing Day 2025 - GitHub Copilot for QA Workshop
+# Swiss Testing Night 2025 - GitHub Copilot for QA Workshop
 
 This repository contains materials and examples for the hands-on workshop at Swiss Testing Night 2025, focused on leveraging GitHub Copilot for Quality Assurance applications.
 
