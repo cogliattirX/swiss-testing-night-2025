@@ -1,0 +1,15 @@
+{
+  "name": "swiss-testing-day-2025-ui-tests",
+  "version": "1.0.0",
+  "description": "UI Tests for Sauce Demo using Playwright MCP",
+  "scripts": {
+    "test": "playwright test",
+    "test:chrome": "playwright test --project=chromium",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "dependencies": {
+    "@executeautomation/playwright-mcp-server": "latest",
+    "@playwright/test": "^1.39.0"
+  }
+}

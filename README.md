@@ -158,7 +158,41 @@ Xebia's commitment to being "knowledge-obsessed" and its extensive partnership e
 
 ## Getting Started
 
-Let's begin by setting up our test environment.
+**For Workshop Participants:** See [WORKSHOP-GUIDE.md](WORKSHOP-GUIDE.md) for quick setup and execution steps.
+
+**For Workshop Facilitators:** Use [FACILITATION-GUIDE.md](FACILITATION-GUIDE.md) for running effective sessions.
+
+**For Individual Learning:** Follow the detailed setup in [test-automation/docs/setup-guide.md](test-automation/docs/setup-guide.md).
+
+## Documentation Structure
+
+### Core Workshop Materials
+- [WORKSHOP-GUIDE.md](WORKSHOP-GUIDE.md) - Quick start guide for participants
+- [FACILITATION-GUIDE.md](FACILITATION-GUIDE.md) - Session management for facilitators
+- [copilot-context/personas.md](copilot-context/personas.md) - Testing personas and review process
+
+### Technical Documentation  
+- [test-automation/docs/test-strategy.md](test-automation/docs/test-strategy.md) - Testing approach and rationale
+- [test-automation/docs/copilot-test-generation.md](test-automation/docs/copilot-test-generation.md) - AI-powered test creation guide
+- [test-automation/docs/infrastructure.md](test-automation/docs/infrastructure.md) - CI/CD and deployment considerations
+- [copilot-context/copilot-reflection.md](copilot-context/copilot-reflection.md) - Lessons learned and best practices
+
+## Workshop Value Proposition
+
+### For QA Professionals
+- Learn practical AI integration in testing workflows
+- Hands-on experience with modern testing tools
+- Collaborative review processes using personas
+
+### For Development Teams  
+- Understand AI-powered test creation
+- See maintainable test architecture in action
+- Experience cross-functional quality approaches
+
+### For Organizations
+- Evaluate AI testing tools for adoption
+- Understand ROI of AI-enhanced QA processes
+- See practical implementation examples
 
 ## GitHub Copilot Usage Tips
 
