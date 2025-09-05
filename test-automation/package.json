@@ -5,11 +5,19 @@
   "scripts": {
     "test": "playwright test",
     "test:chrome": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:all-browsers": "playwright test --project=chromium --project=firefox --project=webkit",
     "test:headed": "playwright test --headed",
-    "report": "playwright show-report"
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "install:browsers": "playwright install --with-deps"
   },
   "dependencies": {
     "@executeautomation/playwright-mcp-server": "latest",
     "@playwright/test": "^1.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.13"
   }
 }
