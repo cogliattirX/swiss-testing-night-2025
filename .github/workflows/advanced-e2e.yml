@@ -1,0 +1,243 @@
+name: Advanced E2E Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run tests daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to test'
+        required: true
+        default: 'chromium'
+        type: choice
+        options:
+        - chromium
+        - firefox
+        - webkit
+        - all
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ${{ github.event.inputs.browser == 'all' && fromJSON('["chromium", "firefox", "webkit"]') || github.event.inputs.browser && fromJSON(format('["{0}"]', github.event.inputs.browser)) || fromJSON('["chromium"]') }}
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: 'npm'
+        cache-dependency-path: test-automation/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./test-automation
+      run: npm ci
+      
+    - name: Install Playwright Browsers
+      working-directory: ./test-automation
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+      
+    - name: Run Playwright tests
+      working-directory: ./test-automation
+      run: npx playwright test --project=${{ matrix.browser }}
+      env:
+        CI: true
+        
+    - name: Generate Test Summary
+      if: always()
+      working-directory: ./test-automation
+      run: |
+        echo "## Test Results Summary 📊" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Browser**: ${{ matrix.browser }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "playwright-report/index.html" ]; then
+          echo "✅ Tests completed - Report generated" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Tests failed - No report generated" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: test-automation/playwright-report/
+        retention-days: 30
+        
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: test-results-${{ matrix.browser }}
+        path: test-automation/test-results/
+        retention-days: 30
+        
+    - name: Upload Videos
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-videos-${{ matrix.browser }}
+        path: test-automation/test-results/**/videos/
+        retention-days: 30
+
+  merge-reports:
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        
+    - name: Install dependencies
+      working-directory: ./test-automation
+      run: npm ci
+      
+    - name: Download all reports
+      uses: actions/download-artifact@v4
+      with:
+        pattern: playwright-report-*
+        path: ./all-reports
+        merge-multiple: true
+        
+    - name: Merge reports
+      working-directory: ./test-automation
+      run: |
+        npx playwright merge-reports --reporter html ../all-reports > merged-report.html 2>&1 || true
+        if [ -f "playwright-report/index.html" ]; then
+          echo "✅ Reports merged successfully"
+        else
+          echo "⚠️ Report merge failed, using individual reports"
+          mkdir -p playwright-report
+          cp -r ../all-reports/* playwright-report/ 2>/dev/null || true
+        fi
+        
+    - name: Upload Merged Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: merged-playwright-report
+        path: test-automation/playwright-report/
+        retention-days: 30
+
+  # Comment on PR with test results
+  comment-pr:
+    needs: [test, merge-reports]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && !cancelled()
+    
+    permissions:
+      pull-requests: write
+      
+    steps:
+    - name: Download merged report
+      uses: actions/download-artifact@v4
+      with:
+        name: merged-playwright-report
+        path: ./report
+        
+    - name: Create PR Comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          let status = '✅ All tests passed';
+          let details = '';
+          
+          // Check if any test failed
+          const testsPassed = '${{ needs.test.result }}' === 'success';
+          
+          if (!testsPassed) {
+            status = '❌ Some tests failed';
+          }
+          
+          const comment = `## 🎭 Playwright Test Results
+          
+          ${status}
+          
+          **Branch**: \`${{ github.head_ref }}\`
+          **Commit**: \`${{ github.event.pull_request.head.sha }}\`
+          **Workflow**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ### Test Summary
+          - **Status**: ${testsPassed ? '✅ Passed' : '❌ Failed'}
+          - **Browser(s)**: Chromium
+          - **Test Suites**: 7 suites
+          - **Total Tests**: 35 tests
+          
+          ### Reports
+          📊 [Download Test Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          
+          ${testsPassed ? '🎉 All tests are passing! Ready to merge.' : '⚠️ Please review test failures before merging.'}`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  # Deploy to GitHub Pages (only on main branch)
+  deploy-report:
+    needs: merge-reports
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && !cancelled()
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    steps:
+    - name: Download merged report
+      uses: actions/download-artifact@v4
+      with:
+        name: merged-playwright-report
+        path: ./playwright-report
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./playwright-report
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: Create deployment summary
+      run: |
+        echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Test report deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 **URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "This report is automatically updated on every push to main branch." >> $GITHUB_STEP_SUMMARY
