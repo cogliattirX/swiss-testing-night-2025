@@ -1,5 +1,7 @@
 # Testing Personas and Their Critical Reviewers
 
+> **Note**: This document defines the foundational personas for testing scenarios. For comprehensive QA team operations, see [enhanced-qa-team-personas.md](enhanced-qa-team-personas.md) which includes specialized roles for AI-powered testing, security, accessibility, and workshop facilitation.
+
 This document defines the various personas used in our testing scenarios and their corresponding critical reviewers who ensure the quality and relevance of generated content.
 
 ## 1. Test Automation Engineer
@@ -153,3 +155,40 @@ When using these personas with GitHub Copilot:
    - Document the persona and reviewer used for each generation
    - Track any adjustments made based on reviews
    - Maintain consistency across related content
+
+## Enhanced QA Team Integration
+
+For complex tasks requiring multiple perspectives, this repository includes an **Enhanced QA Team** structure documented in [enhanced-qa-team-personas.md](enhanced-qa-team-personas.md). This team includes:
+
+### Additional Specialized Roles:
+- 🤖 **AI-Testing Specialist**: GitHub Copilot mastery, prompt engineering
+- 🔒 **Security Testing Specialist**: Vulnerability testing, compliance validation  
+- ♿ **Accessibility Testing Expert**: WCAG compliance, inclusive design
+- 📱 **Cross-Platform Testing Engineer**: Multi-browser, responsive testing
+- 📊 **Test Data Management Specialist**: Data privacy, synthetic data generation
+- 🎓 **QA Workshop Facilitator**: Training delivery, knowledge transfer
+- 🔧 **QA Tools Integration Expert**: CI/CD optimization, automation frameworks
+- 🎯 **Performance Testing Engineer**: Load testing, scalability validation
+
+### Multi-Perspective Workflow:
+1. **Task Analysis**: Determine which personas are needed
+2. **Primary Assignment**: Designate lead persona based on task type
+3. **Cross-Review**: 2-3 supporting personas provide perspective
+4. **Critical Review**: Designated reviewer challenges assumptions
+5. **Team Consensus**: Collaborative decision on final approach
+
+### When to Use Enhanced Team:
+- Complex multi-domain tasks (security + performance + AI)
+- Workshop content creation and delivery
+- Production-ready test suite development
+- Tool integration and infrastructure decisions
+- Cross-functional quality concerns
+
+**Example Team Activation:**
+```
+Task: "Create accessibility tests for checkout flow with AI assistance"
+→ Lead: Accessibility Testing Expert
+→ Support: AI-Testing Specialist, Cross-Platform Engineer  
+→ Reviewer: UX Accessibility Consultant
+→ Facilitator: QA Workshop Facilitator (if for training)
+```

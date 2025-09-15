@@ -53,11 +53,33 @@ GitHub Copilot is an AI-powered code completion tool that helps developers write
      - Business Analyst
      - And more...
 
-## Hands-on Workshop: UI Testing with Playwright & MCP
+6. **🆕 Universal Website Testing** 
+   - AI-powered analysis of **any website**
+   - Automatic quality assessment generation
+   - Generic testing framework for unknown sites
+   - Comprehensive quality reports with business insights
 
-In this workshop, we'll focus on practical UI testing using Playwright with the Model Context Protocol (MCP) server. This combination allows for powerful browser automation with AI assistance.
+## Hands-on Workshop: AI-Powered Testing for Any Website
 
-### Setup and Prerequisites (TBD)
+This workshop demonstrates both **specific implementation** (Sauce Demo) and **universal application** (any website) of AI-powered testing.
+
+### 🎯 **Dual Approach**:
+1. **Concrete Example**: Complete Sauce Demo test suite (35 tests, 100% success rate)
+2. **Universal Application**: Framework that can test and assess ANY website
+
+### 🤖 **AI-Powered Website Analysis**
+```
+Prompt: "Test website https://example.com and provide quality report"
+
+→ AI automatically:
+✅ Analyzes website structure and functionality
+✅ Generates comprehensive test suite
+✅ Executes performance and accessibility checks  
+✅ Creates executive quality report with recommendations
+✅ Provides implementation roadmap for improvements
+```
+
+### Setup and Prerequisites
 - Node.js installation
 - GitHub Copilot subscription
 - VS Code with GitHub Copilot extension
@@ -167,6 +189,48 @@ See [.github/README.md](.github/README.md) for complete CI/CD documentation.
    - Accessibility testing
    - Visual regression
 
+## 🚀 Universal Website Testing Framework
+
+### **Test Any Website with AI Power**
+
+Beyond the Sauce Demo implementation, this repository includes a **Universal Website Testing Framework** that can analyze and test **any website** using GitHub Copilot.
+
+#### **Capabilities**:
+```bash
+# Example: Comprehensive website analysis
+Prompt: "Test website https://company.com for overall quality"
+
+→ AI generates:
+✅ Automatic website structure discovery
+✅ Technology stack identification  
+✅ Multi-persona quality assessment
+✅ Generated test suites for all critical areas
+✅ Executive quality report with scores
+✅ Implementation roadmap for improvements
+```
+
+#### **Framework Components**:
+- 🔍 **Website Discovery Engine**: Automatic structure and technology analysis
+- 🧪 **Generic Test Generator**: AI-powered test creation for any site structure  
+- 📊 **Quality Assessment Engine**: Multi-dimensional scoring and reporting
+- 👥 **8-Persona Analysis Team**: Specialized expertise for comprehensive coverage
+- 📋 **Executive Reporting**: Business-focused insights and recommendations
+
+#### **Use Cases**:
+- **E-commerce Sites**: Shopping cart, checkout, product catalog testing
+- **Corporate Websites**: Contact forms, content accessibility, SEO analysis
+- **SaaS Applications**: User workflows, authentication, performance testing
+- **Portfolio Sites**: Responsive design, loading optimization, accessibility
+- **Any Website**: Comprehensive quality assessment with actionable insights
+
+#### **Workshop Value**:
+- **Participants bring their own websites** for live analysis
+- **Immediate business applicability** beyond demo scenarios
+- **Transferable methodology** for any organization
+- **Real-world ROI demonstration** with actual quality assessments
+
+**Documentation**: See [`docs/universal-website-testing-framework.md`](docs/universal-website-testing-framework.md) for complete implementation guide.
+
 ## About Xebia
 
 Xebia is a global IT consultancy and technology company that specializes in digital transformation with a strong focus on AI integration and quality assurance. As a pioneer in the AI era, Xebia brings extensive expertise in:
@@ -241,6 +305,13 @@ Xebia's commitment to being "knowledge-obsessed" and its extensive partnership e
 
 ## GitHub Copilot Usage Tips
 
+> **📋 IMPORTANT**: Before using GitHub Copilot, read [`.copilot-instructions.md`](.copilot-instructions.md) for project-specific context and standards.
+
+### Quick Start for Context-Aware Prompts
+1. **Always Include Project Context**: Copy the context block from [`.copilot-instructions.md`](.copilot-instructions.md)
+2. **Select Appropriate Persona**: Use [`copilot-context/enhanced-qa-team-personas.md`](copilot-context/enhanced-qa-team-personas.md)
+3. **Validate Generated Code**: Follow [`copilot-context/.copilot-validation.md`](copilot-context/.copilot-validation.md)
+
 ### Accepting Suggestions
 - **Tab or Right Arrow**: Accept the current suggestion
 - **Ctrl+Enter**: See all suggestions in a separate panel
@@ -250,12 +321,18 @@ Xebia's commitment to being "knowledge-obsessed" and its extensive partnership e
 - **Ctrl+/**: Accept word suggestion
 - **Esc**: Dismiss current suggestion
 
-### Best Practices
-1. Use clear and descriptive comments to get better suggestions
-2. Break down complex tasks into smaller, more manageable pieces
-3. Review suggestions carefully before accepting them
-4. Use Copilot to generate test cases and scenarios
-5. Leverage Copilot for generating test data and edge cases
+### Best Practices for This Project
+1. **Context First**: Always include the standard context block from `.copilot-instructions.md`
+2. **Persona-Based**: Start prompts with specific persona (AI-Testing Specialist, Security Expert, etc.)
+3. **Quality Gates**: Use the validation checklist before accepting generated code
+4. **Workshop Ready**: Ensure code is demonstrable in 30-minute sessions
+5. **Reference Documentation**: Link to project-specific testing strategies and standards
+
+### Essential Files for Copilot Success
+- 📋 [`.copilot-instructions.md`](.copilot-instructions.md) - Complete Copilot context and standards
+- 🚀 [`copilot-context/.copilot-quick-reference.md`](copilot-context/.copilot-quick-reference.md) - Quick context blocks
+- ✅ [`copilot-context/.copilot-validation.md`](copilot-context/.copilot-validation.md) - Quality validation checklist
+- 👥 [`copilot-context/enhanced-qa-team-personas.md`](copilot-context/enhanced-qa-team-personas.md) - QA team personas
 
 ## References
 
