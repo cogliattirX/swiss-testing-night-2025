@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { WebsiteQualityReporter } from '../../test-helpers/quality-reporter';
-import { createObservableActions } from '../../test-helpers/observability';
+import { WebsiteQualityReporter } from '../../../test-helpers/quality-reporter';
+import { createObservableActions } from '../../../test-helpers/observability';
 
 /**
  * Generic Website Quality Assessment Test
