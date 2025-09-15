@@ -7,9 +7,9 @@ The Test Execution Observability Framework transforms fast-paced automated tests
 
 ### 🎯 Multiple Execution Modes
 - **CI Mode** (`TEST_MODE=ci`): Fast execution for automated pipelines (0ms delays)
-- **Debug Mode** (`TEST_MODE=debug`): Moderate pace for debugging (1000ms delays)
-- **Demo Mode** (`TEST_MODE=demo`): Presentation-friendly pace (2000ms delays)
-- **Workshop Mode** (`TEST_MODE=workshop`): Slow, educational pace (3000ms delays)
+- **Debug Mode** (`TEST_MODE=debug`): Moderate pace for debugging (500ms delays)
+- **Demo Mode** (`TEST_MODE=demo`): Presentation-friendly pace (800ms delays)
+- **Workshop Mode** (`TEST_MODE=workshop`): Educational pace (1200ms delays)
 
 ### 🎨 Visual Enhancements
 - **Element Highlighting**: Red outlines with shadows highlight interacted elements
@@ -115,8 +115,8 @@ Perfect for:
 - **Client Presentations**: Professional demo mode
 
 ### Workshop Mode Features
-- 3-second delays between actions
-- Character-by-character typing
+- 1.2-second delays between actions
+- Character-by-character typing (30ms delay per character)
 - Element highlighting with animations
 - Comprehensive console logging
 - Automatic screenshot capture
@@ -127,9 +127,9 @@ Perfect for:
 | Mode | Delay | Test Duration | Use Case |
 |------|-------|---------------|----------|
 | CI | 0ms | 1.6s | Automated pipelines |
-| Debug | 1000ms | ~30s | Debugging |
-| Demo | 2000ms | ~45s | Presentations |
-| Workshop | 3000ms | 60s+ | Training |
+| Debug | 500ms | ~15s | Debugging |
+| Demo | 800ms | ~25s | Presentations |
+| Workshop | 1200ms | 35s+ | Training |
 
 ## Best Practices
 

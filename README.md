@@ -1,9 +1,28 @@
-# Swiss Testing Night 2025 - GitHub Copilot for QA Workshop
+# Swiss Testing Night 2025 🎯
+
+> **AI-Powered Website Quality Assessment Workshop**
+> 
+> Transform any website quality assessment from subjective guesswork into evidence-backed professional reports using AI and automated testing.
 
 [![Playwright Tests](https://github.com/cogliattirX/swiss-testing-night-2025/actions/workflows/playwright-tests.yml/badge.svg)](https://github.com/cogliattirX/swiss-testing-night-2025/actions/workflows/playwright-tests.yml)
 [![Advanced E2E Testing](https://github.com/cogliattirX/swiss-testing-night-2025/actions/workflows/advanced-e2e.yml/badge.svg)](https://github.com/cogliattirX/swiss-testing-night-2025/actions/workflows/advanced-e2e.yml)
 
-This repository contains materials and examples for the hands-on workshop at Swiss Testing Night 2025, focused on leveraging GitHub Copilot for Quality Assurance applications.
+## 🚀 Quick Start (5 minutes)
+
+```bash
+# 1. Setup
+cd test-automation
+npm install
+npx playwright install --with-deps
+
+# 2. Test any website (change URL in the file)
+npm run test:workshop -- tests/websites/generic/simple-quality-check.spec.ts
+
+# 3. View results
+npm run report
+```
+
+**What you get**: Professional quality assessment with scores, evidence, and recommendations for any website.
 
 ## Event Context
 

@@ -58,7 +58,7 @@ export class ObservableTestActions {
     
     if (this.mode === 'workshop' || this.mode === 'demo') {
       // Type character by character for better visibility
-      await this.page.type(selector, value, { delay: Math.max(50, this.slowdownMs / 20) });
+      await this.page.type(selector, value, { delay: Math.max(30, this.slowdownMs / 40) });
     } else {
       await this.page.fill(selector, value);
     }
@@ -153,7 +153,7 @@ export class ObservableTestActions {
       }, selector);
       
       // Brief pause to show highlight
-      await this.page.waitForTimeout(300);
+      await this.page.waitForTimeout(200);
     } catch (error) {
       // Ignore highlighting errors
     }
@@ -165,9 +165,9 @@ export class ObservableTestActions {
   private async addDelay() {
     const delays: Record<string, number> = {
       ci: 0,
-      debug: 1000,
-      demo: 2000,
-      workshop: 3000
+      debug: 500,
+      demo: 800,
+      workshop: 1200
     };
     
     const delay = delays[this.mode] || this.slowdownMs;

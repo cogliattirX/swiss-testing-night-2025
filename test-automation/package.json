@@ -15,6 +15,10 @@
     "test:firefox": "playwright test --project=firefox",
     "test:webkit": "playwright test --project=webkit",
     "test:all-browsers": "cross-env TEST_MODE=ci playwright test --project=chromium --project=firefox --project=webkit",
+    "mcp:start": "@executeautomation/playwright-mcp-server",
+    "workshop:setup": "npm install && npx playwright install --with-deps",
+    "workshop:demo": "npm run test:demo -- tests/websites/generic/simple-quality-check.spec.ts",
+    "workshop:sauce": "npm run test:workshop -- tests/websites/sauce-demo/",
     "report": "playwright show-report",
     "trace:show": "playwright show-trace",
     "install:browsers": "playwright install --with-deps"
