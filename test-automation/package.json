@@ -4,7 +4,9 @@
   "description": "UI Tests for Sauce Demo using Playwright MCP",
   "scripts": {
     "test": "playwright test",
-    "test:ci": "cross-env TEST_MODE=ci playwright test",
+    "test:ci": "cross-env TEST_MODE=ci playwright test tests/websites/sauce-demo/checkout-flow.spec.ts tests/websites/sauce-demo/error-handling.spec.ts tests/websites/sauce-demo/login.spec.ts tests/websites/sauce-demo/login-success.spec.ts tests/websites/sauce-demo/navigation-state.spec.ts tests/websites/sauce-demo/product-sorting.spec.ts tests/websites/sauce-demo/shopping-cart.spec.ts",
+    "test:ci:stable": "cross-env TEST_MODE=ci playwright test tests/websites/sauce-demo/checkout-flow.spec.ts tests/websites/sauce-demo/error-handling.spec.ts tests/websites/sauce-demo/login.spec.ts tests/websites/sauce-demo/login-success.spec.ts tests/websites/sauce-demo/navigation-state.spec.ts tests/websites/sauce-demo/product-sorting.spec.ts tests/websites/sauce-demo/shopping-cart.spec.ts",
+    "test:all": "cross-env TEST_MODE=ci playwright test",
     "test:debug": "cross-env TEST_MODE=debug playwright test --project=chromium",
     "test:demo": "cross-env TEST_MODE=demo playwright test --project=chromium",
     "test:workshop": "cross-env TEST_MODE=workshop playwright test --project=chromium",
