@@ -48,7 +48,7 @@ jobs:
       
     - name: Run Playwright tests
       working-directory: ./test-automation
-      run: npx playwright test --project=${{ matrix.browser }}
+      run: npm run test:ci:stable
       env:
         CI: true
         

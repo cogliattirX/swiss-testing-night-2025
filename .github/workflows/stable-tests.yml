@@ -1,0 +1,94 @@
+name: Stable Tests
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  stable-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: 'npm'
+        cache-dependency-path: test-automation/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./test-automation
+      run: npm ci
+      
+    - name: Install Playwright Browsers
+      working-directory: ./test-automation
+      run: npx playwright install --with-deps chromium
+      
+    - name: Run stable tests (Sauce Demo only)
+      working-directory: ./test-automation
+      run: npm run test:ci:stable
+      env:
+        CI: true
+        
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: stable-test-report
+        path: test-automation/playwright-report/
+        retention-days: 30
+        
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: stable-test-results
+        path: test-automation/test-results/
+        retention-days: 30
+
+  # Deploy to GitHub Pages (only on main branch)
+  deploy-stable-report:
+    needs: stable-tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && !cancelled()
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    steps:
+    - name: Download test report
+      uses: actions/download-artifact@v4
+      with:
+        name: stable-test-report
+        path: ./playwright-report
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./playwright-report
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: Create deployment summary
+      run: |
+        echo "## 🚀 Stable Tests Deployment" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Stable test report deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 **URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Tests included**: Sauce Demo E2E tests (reliable, production-ready)" >> $GITHUB_STEP_SUMMARY

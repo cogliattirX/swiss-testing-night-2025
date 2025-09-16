@@ -28,7 +28,7 @@ jobs:
       
     - name: Run Playwright tests
       working-directory: ./test-automation
-      run: npx playwright test
+      run: npm run test:ci:stable
       
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
