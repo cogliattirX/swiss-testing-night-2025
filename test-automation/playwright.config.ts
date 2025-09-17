@@ -81,7 +81,7 @@ export default defineConfig({
   
   reporter: [
     ['html', { 
-      open: observabilityConfig.mode !== 'ci' ? 'always' : 'never',
+      open: 'never',  // Never auto-open HTML report
       outputFolder: 'playwright-report'
     }],
     ['list'],
