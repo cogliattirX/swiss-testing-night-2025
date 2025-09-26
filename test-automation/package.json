@@ -1,0 +1,35 @@
+{
+  "name": "swiss-testing-day-2025-ui-tests",
+  "version": "1.0.0",
+  "description": "UI Tests for Sauce Demo using Playwright MCP",
+  "scripts": {
+    "test": "playwright test",
+    "test:ci": "cross-env TEST_MODE=ci playwright test",
+    "test:debug": "cross-env TEST_MODE=debug playwright test --project=chromium",
+    "test:demo": "cross-env TEST_MODE=demo playwright test --project=chromium",
+    "test:workshop": "cross-env TEST_MODE=workshop playwright test --project=chromium",
+    "test:headed": "cross-env TEST_MODE=demo playwright test --project=chromium",
+    "test:slow": "cross-env TEST_MODE=workshop playwright test --project=chromium",
+    "test:record": "cross-env TEST_MODE=workshop playwright test --project=chromium",
+    "test:chrome": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:all-browsers": "cross-env TEST_MODE=ci playwright test --project=chromium --project=firefox --project=webkit",
+    "mcp:start": "@executeautomation/playwright-mcp-server",
+    "workshop:setup": "npm install && npx playwright install --with-deps",
+    "workshop:demo": "npm run test:demo -- tests/websites/generic/simple-quality-check.spec.ts",
+    "workshop:sauce": "npm run test:workshop -- tests/websites/sauce-demo/",
+    "report": "playwright show-report",
+    "trace:show": "playwright show-trace",
+    "install:browsers": "playwright install --with-deps"
+  },
+  "dependencies": {
+    "@executeautomation/playwright-mcp-server": "latest",
+    "@playwright/test": "^1.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.13",
+    "cross-env": "^10.0.0",
+    "typescript": "^5.9.2"
+  }
+}
