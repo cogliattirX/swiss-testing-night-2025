@@ -81,7 +81,7 @@ export default defineConfig({
   
   reporter: [
     ['html', { 
-      open: observabilityConfig.mode !== 'ci' ? 'always' : 'never',
+      open: 'never',  // HTML report wird nie automatisch geöffnet
       outputFolder: 'playwright-report'
     }],
     ['list'],
@@ -115,7 +115,12 @@ export default defineConfig({
         headless: !observabilityConfig.headed,
         launchOptions: {
           slowMo: observabilityConfig.slowdown,
-          devtools: observabilityConfig.mode === 'debug'
+          devtools: false, // DevTools sind immer deaktiviert
+          // Browser-Fenster im gleichen Bildschirm öffnen
+          args: [
+            '--window-position=100,100', // Position des Browser-Fensters
+            '--window-size=1280,720'     // Größe des Browser-Fensters
+          ]
         }
       },
     },
