@@ -33,11 +33,11 @@ const config: Options.Testrunner = {
         'appium:automationName': 'UiAutomator2',
         
         // Emulator configuration
-        'appium:avd': 'Pixel_8a_API_34', // Will be created during setup
+        'appium:avd': 'Pixel_8a_API_36', // Created AVD name
         'appium:avdLaunchTimeout': 180000, // 3 minutes for emulator startup
         'appium:avdReadyTimeout': 180000, // 3 minutes for emulator ready
         'appium:deviceName': 'Android Emulator',
-        'appium:platformVersion': '14.0', // Android 14 (API 34)
+        'appium:platformVersion': '15.0', // Android 15 (API 36)
         
         // App configuration - START INSTALLED APP (NOT APK)
         'appium:appPackage': 'com.geberit.home',
@@ -134,7 +134,7 @@ const config: Options.Testrunner = {
         console.log('🧪 Setting up emulator test environment...');
         
         // Set global timeouts (more lenient for emulator)
-        browser.setTimeout({
+        driver.setTimeout({
             'implicit': 20000, // 20 seconds for element finding
             'script': 90000,   // 1.5 minutes for script execution
             'pageLoad': 90000  // 1.5 minutes for page load
@@ -155,19 +155,19 @@ const config: Options.Testrunner = {
             const screenshotPath = path.join(process.cwd(), 'screenshots', `emulator-failure-${timestamp}.png`);
             
             try {
-                await browser.saveScreenshot(screenshotPath);
+                await driver.saveScreenshot(screenshotPath);
                 console.log('📸 Emulator failure screenshot saved:', screenshotPath);
-            } catch (screenshotError) {
+            } catch (screenshotError: any) {
                 console.log('⚠️ Could not save emulator screenshot:', screenshotError.message);
             }
             
             // Save page source on failure
             try {
-                const pageSource = await browser.getPageSource();
+                const pageSource = await driver.getPageSource();
                 const pageSourcePath = path.join(process.cwd(), 'reports', `emulator-failure-${timestamp}-source.xml`);
                 require('fs').writeFileSync(pageSourcePath, pageSource);
                 console.log('📄 Emulator page source saved:', pageSourcePath);
-            } catch (sourceError) {
+            } catch (sourceError: any) {
                 console.log('⚠️ Could not save emulator page source:', sourceError.message);
             }
         }
