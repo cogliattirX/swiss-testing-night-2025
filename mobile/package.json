@@ -1,0 +1,50 @@
+{
+  "name": "swiss-testing-night-2025-mobile",
+  "version": "1.0.0",
+  "description": "Mobile testing framework for Geberit Home Android app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wdio run config/wdio.local.android.ts",
+    "test": "wdio run config/wdio.local.android.ts",
+    "test:debug": "wdio run config/wdio.local.android.ts --debug",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rimraf reports/* screenshots/*",
+    "postinstall": "echo 'Setup complete! Run npm run dev to start testing'"
+  },
+  "keywords": [
+    "mobile",
+    "testing",
+    "webdriverio",
+    "appium",
+    "android",
+    "geberit"
+  ],
+  "author": "Swiss Testing Night 2025",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "@wdio/appium-service": "^8.38.0",
+    "@wdio/cli": "^8.38.0",
+    "@wdio/globals": "^8.38.0",
+    "@wdio/local-runner": "^8.38.0",
+    "@wdio/mocha-framework": "^8.38.0",
+    "@wdio/spec-reporter": "^8.38.0",
+    "@wdio/junit-reporter": "^8.38.0",
+    "@wdio/types": "^8.38.0",
+    "appium": "^2.11.2",
+    "appium-uiautomator2-driver": "^3.6.2",
+    "eslint": "^8.57.0",
+    "rimraf": "^5.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3",
+    "webdriverio": "^8.38.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
