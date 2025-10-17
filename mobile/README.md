@@ -117,8 +117,9 @@ npm run dev
 npm run test:debug
 ```
 
-## 🏃‍♂️ Schnellstart (Copy & Paste)
+## 🚀 Schnellstart (Copy & Paste)
 
+### Für echtes Gerät (Pixel 8a):
 ```powershell
 # Schritt 1: Globale Tools
 npm install -g appium
@@ -134,20 +135,51 @@ adb shell "cmd package resolve-activity --brief com.geberit.home | tail -n 1"
 cd mobile
 npm install
 
-# Schritt 5: Activity in config/wdio.local.android.ts eintragen
-# Schritt 6: Test starten
+# Schritt 5: Umgebung prüfen
+npm run check:env
+
+# Schritt 6: Activity in config/wdio.local.android.ts eintragen
+# Schritt 7: Test starten
 npm run dev
+```
+
+### Für Android Emulator:
+```powershell
+# Schritt 1: Android Studio installieren (falls noch nicht geschehen)
+# Schritt 2: Projekt setup
+cd mobile
+npm install
+
+# Schritt 3: Emulator erstellen
+npm run setup:emulator
+
+# Schritt 4: Geberit Home app im Emulator installieren (über Play Store)
+# Schritt 5: Activity ermitteln
+adb shell "cmd package resolve-activity --brief com.geberit.home | tail -n 1"
+
+# Schritt 6: Activity in config/wdio.emulator.android.ts eintragen
+# Schritt 7: Emulator-Test starten
+npm run test:emulator
 ```
 
 ## 📝 Verfügbare Scripts
 
 ```powershell
-npm run dev          # Standard Testlauf
-npm run test         # Gleich wie dev
-npm run test:debug   # Mit Debug-Ausgabe
-npm run lint         # Code-Qualität prüfen
-npm run lint:fix     # Code automatisch formatieren
-npm run clean        # Reports und Screenshots löschen
+# Real Device Testing
+npm run dev              # Standard Test auf echtem Gerät
+npm run test             # Gleich wie dev
+npm run test:debug       # Mit Debug-Ausgabe
+
+# Emulator Testing
+npm run test:emulator         # Test auf Android Emulator
+npm run test:emulator:debug   # Emulator mit Debug-Ausgabe
+npm run setup:emulator        # Emulator erstellen und konfigurieren
+
+# Environment & Maintenance
+npm run check:env        # Umgebung und Setup überprüfen
+npm run lint             # Code-Qualität prüfen
+npm run lint:fix         # Code automatisch formatieren
+npm run clean            # Reports und Screenshots löschen
 ```
 
 ## 🧪 Test-Struktur
@@ -168,6 +200,55 @@ Der Grundtest überprüft:
 - **Failure Screenshots**: `screenshots/failure-[test]-[timestamp].png`
 - **Test Reports**: `reports/results-[id].xml` (JUnit Format)
 - **Page Sources**: `reports/geberit-home-source-[timestamp].xml`
+
+## 📱 Android Emulator Setup
+
+### Automatisches Setup
+
+Das Framework erstellt automatisch einen Pixel 8a Emulator:
+
+```powershell
+npm run setup:emulator
+```
+
+**Was passiert:**
+1. ✅ Prüft Android SDK Installation
+2. ✅ Installiert Android 14 (API 34) System Image
+3. ✅ Erstellt AVD "Pixel_8a_API_34" mit optimierten Einstellungen
+4. ✅ Startet Emulator zum Test
+5. ✅ Konfiguriert Performance-Optimierungen
+
+### Emulator-spezifische Features
+
+- **Längere Timeouts**: 3-5 Minuten für Emulator-Startup
+- **Auto-Wipe**: Sauberer Zustand bei jedem Test
+- **Performance-Optimierungen**: GPU-Acceleration, reduzierte Animations
+- **Erweiterte Logs**: Detaillierte Debug-Informationen
+
+### Emulator vs. Real Device
+
+| Feature | Real Device (Pixel 8a) | Android Emulator |
+|---------|------------------------|------------------|
+| **Geschwindigkeit** | ⚡ Sehr schnell | 🐌 Langsamer |
+| **Stabilität** | ✅ Sehr stabil | ⚠️ Kann variieren |
+| **Setup** | 📱 USB + App | 💻 Vollautomatisch |
+| **CI/CD** | ❌ Schwierig | ✅ Ideal |
+| **Debugging** | 🔍 Hardware-nah | 🛠️ Vollzugriff |
+| **Parallelisierung** | ❌ Ein Gerät | ✅ Mehrere AVDs |
+
+### Wann welche Option wählen?
+
+**Real Device (Pixel 8a)** für:
+- 🚀 Schnelle lokale Entwicklung
+- 📱 Hardware-spezifische Tests
+- 🔋 Performance-kritische Tests
+- 📸 Kamera/Sensor-Tests
+
+**Android Emulator** für:
+- 🤖 CI/CD Pipelines
+- 🧪 Regressionstests
+- 🔄 Automatisierte Nightly Builds
+- 👥 Team-Entwicklung ohne Hardware
 
 ## 🔧 Konfiguration
 

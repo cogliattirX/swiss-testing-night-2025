@@ -7,10 +7,14 @@
     "dev": "wdio run config/wdio.local.android.ts",
     "test": "wdio run config/wdio.local.android.ts",
     "test:debug": "wdio run config/wdio.local.android.ts --debug",
+    "test:emulator": "wdio run config/wdio.emulator.android.ts",
+    "test:emulator:debug": "wdio run config/wdio.emulator.android.ts --debug",
+    "setup:emulator": "powershell -ExecutionPolicy Bypass -File setup-emulator.ps1",
+    "check:env": "powershell -ExecutionPolicy Bypass -File check-environment.ps1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rimraf reports/* screenshots/*",
-    "postinstall": "echo 'Setup complete! Run npm run dev to start testing'"
+    "postinstall": "echo 'Setup complete! Run npm run check:env to verify your environment'"
   },
   "keywords": [
     "mobile",
