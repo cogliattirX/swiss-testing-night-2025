@@ -1,0 +1,10 @@
+{
+  "platformName": "Android",
+  "appium:deviceName": "emulator-5554",
+  "appium:automationName": "UiAutomator2",
+  "appium:appPackage": "com.saucelabs.mydemoapp.android",
+  "appium:appActivity": ".view.activities.SplashActivity",
+  "appium:noReset": false,
+  "appium:autoGrantPermissions": true,
+  "appium:newCommandTimeout": 300
+}

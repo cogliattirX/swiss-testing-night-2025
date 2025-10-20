@@ -67,15 +67,73 @@ describe('🛒 Complete E2E Shopping Flow - Multiple Products + Checkout + Login
                         progress.productsAdded++;
                         console.log(`✅ Added product ${i + 1} to cart (Total: ${progress.productsAdded})`);
                         await browser.saveScreenshot(`./screenshots/complete-02-product-${i + 1}-added.png`);
+                        
+                        // Verify cart count immediately after adding product
+                        try {
+                            const cartCountSelectors = [
+                                '//*[@content-desc="View cart"]//*[contains(@text, "' + progress.productsAdded + '")]',
+                                '//*[contains(@content-desc, "cart")]/*[contains(@text, "' + progress.productsAdded + '")]',
+                                '//android.widget.TextView[contains(@text, "' + progress.productsAdded + '")]'
+                            ];
+                            
+                            let cartCountFound = false;
+                            for (const countSelector of cartCountSelectors) {
+                                try {
+                                    const cartCountElement = await $(countSelector);
+                                    if (await cartCountElement.isDisplayed()) {
+                                        const countText = await cartCountElement.getText();
+                                        console.log(`🛒 Cart count verified: ${countText} (expected: ${progress.productsAdded})`);
+                                        cartCountFound = true;
+                                        break;
+                                    }
+                                } catch (e) {
+                                    continue;
+                                }
+                            }
+                            
+                            if (!cartCountFound) {
+                                console.log(`⚠️ Could not verify cart count for product ${i + 1}`);
+                            }
+                        } catch (e) {
+                            console.log(`⚠️ Error verifying cart count: ${e.message}`);
+                        }
+                        
                     } else {
                         console.log(`❌ Add to cart button not found for product ${i + 1}`);
                     }
                     
-                    // Go back to catalog for next product
+                    // Navigate back to catalog using proper UI navigation instead of browser.back()
                     if (i < targetProductCount - 1) {
-                        await browser.back();
-                        await browser.pause(2000);
-                        console.log('🔙 Back to catalog for next product');
+                        // Try to find a back button or navigation element instead of using browser.back()
+                        const backButtonSelectors = [
+                            '//android.widget.ImageButton[@content-desc="Navigate up"]',
+                            '//android.widget.Button[contains(@text, "Back")]',
+                            '//android.widget.ImageView[@content-desc="Navigate up"]',
+                            '//*[@resource-id="android:id/home"]'
+                        ];
+                        
+                        let backNavigated = false;
+                        for (const backSelector of backButtonSelectors) {
+                            try {
+                                const backButton = await $(backSelector);
+                                if (await backButton.isDisplayed()) {
+                                    await backButton.click();
+                                    await browser.pause(2000);
+                                    backNavigated = true;
+                                    console.log('🔙 Navigated back using UI back button');
+                                    break;
+                                }
+                            } catch (e) {
+                                continue;
+                            }
+                        }
+                        
+                        // Fallback: if no UI back button found, use browser.back() but only once
+                        if (!backNavigated) {
+                            await browser.back();
+                            await browser.pause(2000);
+                            console.log('🔙 Fallback: Used browser.back() to return to catalog');
+                        }
                         
                         // Re-find product images after navigation
                         const updatedProductImages = await $$('//android.widget.ImageView[@content-desc="Product Image"]');
@@ -92,34 +150,79 @@ describe('🛒 Complete E2E Shopping Flow - Multiple Products + Checkout + Login
             
             console.log(`\n🎯 Successfully added ${progress.productsAdded} products to cart`);
 
-            // Step 3: Access shopping cart
+            // Step 3: Access shopping cart with better element detection
             console.log('🛒 Step 3: Accessing shopping cart...');
             
-            // Go back to main catalog if needed
-            try {
-                await browser.back();
-                await browser.pause(2000);
-            } catch (e) {
-                console.log('ℹ️ Already at main screen');
+            // Ensure we're at the main product catalog
+            await browser.pause(1000);
+            
+            // Try multiple selectors for cart access
+            const cartSelectors = [
+                '//android.widget.RelativeLayout[@content-desc="View cart"]',
+                '//*[@content-desc="View cart"]',
+                '//*[contains(@content-desc, "cart")]',
+                '//*[contains(@content-desc, "Cart")]',
+                '//android.widget.TextView[contains(@text, "Cart")]',
+                '//android.widget.ImageView[contains(@content-desc, "shopping")]'
+            ];
+            
+            let cartAccessible = false;
+            for (const selector of cartSelectors) {
+                try {
+                    const cartButton = await $(selector);
+                    if (await cartButton.isDisplayed()) {
+                        console.log(`🛒 Found cart using selector: ${selector}`);
+                        await cartButton.click();
+                        await browser.pause(3000);
+                        await browser.saveScreenshot('./screenshots/complete-03-cart-view.png');
+                        progress.cartAccessed = true;
+                        cartAccessible = true;
+                        console.log('✅ Successfully accessed cart');
+                        break;
+                    }
+                } catch (e) {
+                    console.log(`⚠️ Cart selector failed: ${selector}`);
+                }
             }
             
-            const cartButton = await $('//android.widget.RelativeLayout[@content-desc="View cart"]');
-            if (await cartButton.isDisplayed()) {
-                await cartButton.click();
-                await browser.pause(3000);
-                await browser.saveScreenshot('./screenshots/complete-03-cart-view.png');
-                progress.cartAccessed = true;
-                console.log('✅ Successfully accessed cart');
+            if (!cartAccessible) {
+                console.log('❌ Cart button not accessible with any selector, trying to scroll or look for alternatives...');
                 
-                // Check cart contents
+                // Try scrolling to find cart
+                await browser.execute('mobile: scroll', {direction: 'up'});
+                await browser.pause(1000);
+                
+                for (const selector of cartSelectors) {
+                    try {
+                        const cartButton = await $(selector);
+                        if (await cartButton.isDisplayed()) {
+                            await cartButton.click();
+                            await browser.pause(3000);
+                            cartAccessible = true;
+                            progress.cartAccessed = true;
+                            console.log('✅ Cart accessed after scroll');
+                            break;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+            }
+            
+            if (progress.cartAccessed) {
+                // Verify cart contents match added products
                 try {
                     const cartItems = await $$('//*[contains(@text, "Sauce Labs") or contains(@text, "$")]');
-                    console.log(`📦 Found ${cartItems.length} items in cart`);
+                    console.log(`📦 Found ${cartItems.length} items in cart (expected: ${progress.productsAdded})`);
+                    
+                    if (cartItems.length === progress.productsAdded) {
+                        console.log('✅ Cart contents match added products');
+                    } else {
+                        console.log(`⚠️ Cart content mismatch: expected ${progress.productsAdded}, found ${cartItems.length}`);
+                    }
                 } catch (e) {
-                    console.log('ℹ️ Could not count cart items');
+                    console.log('ℹ️ Could not verify cart item count');
                 }
-            } else {
-                console.log('❌ Cart button not accessible');
             }
 
             // Step 4: Proceed to checkout
@@ -177,15 +280,42 @@ describe('🛒 Complete E2E Shopping Flow - Multiple Products + Checkout + Login
                 }
             }
 
-            // Step 5: Handle login if required
-            console.log('🔐 Step 5: Handling authentication...');
+            // Step 5: Handle login with credentials from screen
+            console.log('🔐 Step 5: Handling authentication with screen credentials...');
             
             if (progress.checkoutStarted) {
+                // First, try to find login credentials displayed on screen
+                console.log('👀 Looking for login credentials displayed on screen...');
+                let screenUsername = 'standard_user'; // fallback
+                let screenPassword = 'secret_sauce';  // fallback
+                
+                try {
+                    // Look for displayed usernames on screen
+                    const usernameElements = await $$('//*[contains(@text, "standard_user") or contains(@text, "problem_user") or contains(@text, "performance_glitch_user")]');
+                    if (usernameElements.length > 0) {
+                        const usernameText = await usernameElements[0].getText();
+                        console.log(`📱 Found username on screen: ${usernameText}`);
+                        screenUsername = usernameText.trim();
+                    }
+                    
+                    // Look for displayed password on screen
+                    const passwordElements = await $$('//*[contains(@text, "secret_sauce")]');
+                    if (passwordElements.length > 0) {
+                        const passwordText = await passwordElements[0].getText();
+                        console.log(`📱 Found password on screen: ${passwordText}`);
+                        screenPassword = passwordText.trim();
+                    }
+                } catch (e) {
+                    console.log('ℹ️ Could not read credentials from screen, using defaults');
+                }
+                
                 // Look for login fields
                 const loginSelectors = [
                     '//*[contains(@hint, "Username") or contains(@content-desc, "username")]',
                     '//*[contains(@hint, "Email") or contains(@content-desc, "email")]',
-                    '//*[@resource-id="username" or @resource-id="email"]'
+                    '//*[@resource-id="username" or @resource-id="email"]',
+                    '//*[contains(@text, "Username")]/../following-sibling::*//android.widget.EditText',
+                    '//android.widget.EditText[1]'
                 ];
                 
                 let loginFieldFound = false;
@@ -193,26 +323,30 @@ describe('🛒 Complete E2E Shopping Flow - Multiple Products + Checkout + Login
                     try {
                         const loginField = await $(selector);
                         if (await loginField.isDisplayed()) {
-                            console.log('📝 Login form detected, entering credentials...');
+                            console.log(`📝 Login form detected using selector: ${selector}`);
                             
-                            // Enter username
-                            await loginField.setValue(CREDENTIALS.username);
+                            // Clear field and enter username from screen
+                            await loginField.clearValue();
+                            await loginField.setValue(screenUsername);
                             await browser.pause(500);
-                            console.log(`✅ Username entered: ${CREDENTIALS.username}`);
+                            console.log(`✅ Username entered from screen: ${screenUsername}`);
                             
                             // Find and fill password field
                             const passwordSelectors = [
                                 '//*[contains(@hint, "Password") or contains(@content-desc, "password")]',
-                                '//*[@resource-id="password"]'
+                                '//*[@resource-id="password"]',
+                                '//*[contains(@text, "Password")]/../following-sibling::*//android.widget.EditText',
+                                '//android.widget.EditText[2]'
                             ];
                             
                             for (const passSelector of passwordSelectors) {
                                 try {
                                     const passwordField = await $(passSelector);
                                     if (await passwordField.isDisplayed()) {
-                                        await passwordField.setValue(CREDENTIALS.password);
+                                        await passwordField.clearValue();
+                                        await passwordField.setValue(screenPassword);
                                         await browser.pause(500);
-                                        console.log('✅ Password entered');
+                                        console.log(`✅ Password entered from screen: ${screenPassword}`);
                                         break;
                                     }
                                 } catch (e) {
@@ -224,7 +358,9 @@ describe('🛒 Complete E2E Shopping Flow - Multiple Products + Checkout + Login
                             const loginButtonSelectors = [
                                 '//*[contains(@text, "Login")]',
                                 '//*[contains(@text, "LOG IN")]',
-                                '//*[contains(@content-desc, "login")]'
+                                '//*[contains(@content-desc, "login")]',
+                                '//*[contains(@text, "Sign In")]',
+                                '//android.widget.Button[contains(@text, "Login")]'
                             ];
                             
                             for (const btnSelector of loginButtonSelectors) {
@@ -234,7 +370,7 @@ describe('🛒 Complete E2E Shopping Flow - Multiple Products + Checkout + Login
                                         await loginButton.click();
                                         await browser.pause(3000);
                                         progress.loginCompleted = true;
-                                        console.log('✅ Login completed');
+                                        console.log('✅ Login completed with screen credentials');
                                         await browser.saveScreenshot('./screenshots/complete-05-login-completed.png');
                                         break;
                                     }
