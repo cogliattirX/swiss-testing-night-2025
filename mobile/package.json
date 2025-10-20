@@ -9,6 +9,8 @@
     "test:debug": "wdio run config/wdio.local.android.ts --debug",
     "test:emulator": "wdio run config/wdio.emulator.android.ts",
     "test:emulator:debug": "wdio run config/wdio.emulator.android.ts --debug",
+    "test:geberit": "wdio run config/wdio.geberit.js",
+    "test:geberit:demo": "wdio run config/wdio.geberit.js --spec test/specs/geberit-home/demo-mode.spec.js",
     "setup:emulator": "powershell -ExecutionPolicy Bypass -File setup-emulator.ps1",
     "check:env": "powershell -ExecutionPolicy Bypass -File check-environment.ps1",
     "lint": "eslint .",
