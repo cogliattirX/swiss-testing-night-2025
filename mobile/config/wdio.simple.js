@@ -8,13 +8,20 @@ const config = {
     
     maxInstances: 1,
     
+    hostname: 'localhost',
+    port: 4723,
+    path: '/',
+    
     capabilities: [{
         platformName: 'Android',
         'appium:automationName': 'UiAutomator2',
+        'appium:appPackage': 'com.saucelabs.mydemoapp.android',
+        'appium:appActivity': 'com.saucelabs.mydemoapp.android.view.activities.MainActivity',
         'appium:avd': 'Pixel_8a_API_36',
         'appium:avdLaunchTimeout': 120000,
         'appium:deviceName': 'Android Emulator',
-        'appium:newCommandTimeout': 240
+        'appium:newCommandTimeout': 240,
+        'appium:noReset': true
     }],
     
     logLevel: 'info',
