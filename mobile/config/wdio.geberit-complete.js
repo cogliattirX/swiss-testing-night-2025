@@ -8,7 +8,7 @@ exports.config = {
     capabilities: [{
         platformName: 'Android',
         'appium:deviceName': 'emulator-5554',
-        'appium:platformVersion': '11.0',
+        'appium:platformVersion': '16',
         'appium:automationName': 'UiAutomator2',
         'appium:appPackage': 'com.geberit.home',
         'appium:appActivity': 'com.geberit.home.MainActivity',
@@ -48,8 +48,7 @@ exports.config = {
     ],
     mochaOpts: {
         ui: 'bdd',
-        timeout: 180000,
-        compilers: ['js:@babel/register']
+        timeout: 180000
     },
     
     // Setup functions

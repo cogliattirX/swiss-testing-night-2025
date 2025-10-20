@@ -325,6 +325,556 @@ class GeberitAppHelpers {
         
         return allFoundProducts;
     }
+    
+    // New Device-specific functions for Alba Geberit AquaClean workflow
+    
+    static async selectAlbaAquaCleanDevice() {
+        console.log('🎯 Searching for Alba Geberit AquaClean device...');
+        
+        const deviceSelectors = [
+            '//*[contains(@text, "Alba")]',
+            '//*[contains(@text, "AquaClean")]',
+            '//*[contains(@text, "Geberit AquaClean")]',
+            '//*[contains(@text, "alba")]',
+            '//*[contains(@text, "aquaclean")]'
+        ];
+        
+        let foundDevice = null;
+        let scrollAttempts = 0;
+        const maxScrolls = 5;
+        
+        while (!foundDevice && scrollAttempts < maxScrolls) {
+            for (const selector of deviceSelectors) {
+                try {
+                    const elements = await $$(selector);
+                    for (const element of elements) {
+                        const text = await element.getText();
+                        if (text && (text.toLowerCase().includes('alba') || text.toLowerCase().includes('aquaclean'))) {
+                            console.log(`🎯 Found Alba AquaClean device: "${text}"`);
+                            foundDevice = element;
+                            break;
+                        }
+                    }
+                    if (foundDevice) break;
+                } catch (error) {
+                    // Continue searching
+                }
+            }
+            
+            if (!foundDevice && scrollAttempts < maxScrolls - 1) {
+                console.log(`📜 Device not found, scrolling... (${scrollAttempts + 1}/${maxScrolls})`);
+                await this.scrollDown();
+                scrollAttempts++;
+                await driver.pause(2000);
+            } else {
+                break;
+            }
+        }
+        
+        if (!foundDevice) {
+            throw new Error('Alba Geberit AquaClean device not found after scrolling');
+        }
+        
+        await foundDevice.click();
+        console.log('✅ Alba AquaClean device selected');
+        await driver.saveScreenshot('./test-results/screenshots/alba-device-selected.png');
+        await driver.pause(3000);
+        
+        return foundDevice;
+    }
+    
+    static async waitForDeviceConnection() {
+        console.log('🔗 Waiting for device connection...');
+        
+        const connectionIndicators = [
+            '//*[contains(@text, "Verbindung")]',
+            '//*[contains(@text, "Connecting")]',
+            '//*[contains(@text, "Connected")]',
+            '//*[contains(@text, "Verbunden")]',
+            '//*[contains(@text, "connection")]'
+        ];
+        
+        let isConnected = false;
+        let attempts = 0;
+        const maxAttempts = 20; // 40 seconds total
+        
+        while (!isConnected && attempts < maxAttempts) {
+            for (const selector of connectionIndicators) {
+                try {
+                    const element = await $(selector);
+                    if (await element.isExisting()) {
+                        const text = await element.getText();
+                        console.log(`🔗 Connection status: "${text}"`);
+                        
+                        if (text.toLowerCase().includes('verbunden') || 
+                            text.toLowerCase().includes('connected') ||
+                            text.toLowerCase().includes('erfolgreich')) {
+                            isConnected = true;
+                            break;
+                        }
+                    }
+                } catch (error) {
+                    // Continue checking
+                }
+            }
+            
+            if (!isConnected) {
+                await driver.pause(2000);
+                attempts++;
+                console.log(`⏳ Waiting for connection... (${attempts}/${maxAttempts})`);
+            }
+        }
+        
+        if (!isConnected) {
+            console.log('⚠️ Connection timeout, but continuing...');
+        } else {
+            console.log('✅ Device connection established');
+        }
+        
+        await driver.saveScreenshot('./test-results/screenshots/device-connection-status.png');
+        return isConnected;
+    }
+    
+    static async handleDeviceDataConsent() {
+        console.log('📋 Handling device data consent...');
+        
+        const consentSelectors = [
+            '//*[contains(@text, "Gerätedaten")]',
+            '//*[contains(@text, "Zustimmen")]',
+            '//*[contains(@text, "Akzeptieren")]',
+            '//*[contains(@text, "Einverstanden")]',
+            '//*[contains(@text, "OK")]',
+            '//*[contains(@text, "Agree")]',
+            '//*[contains(@text, "Accept")]'
+        ];
+        
+        for (const selector of consentSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    const text = await element.getText();
+                    console.log(`📋 Found consent option: "${text}"`);
+                    
+                    if (text.toLowerCase().includes('zustimmen') || 
+                        text.toLowerCase().includes('akzeptieren') ||
+                        text.toLowerCase().includes('einverstanden') ||
+                        text.toLowerCase().includes('agree') ||
+                        text.toLowerCase().includes('accept') ||
+                        text === 'OK') {
+                        await element.click();
+                        console.log('✅ Device data consent granted');
+                        await driver.saveScreenshot('./test-results/screenshots/device-consent-granted.png');
+                        await driver.pause(3000);
+                        return true;
+                    }
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('ℹ️ No device data consent dialog found');
+        return false;
+    }
+    
+    static async handleNotificationPermissions() {
+        console.log('🔔 Handling notification permissions...');
+        
+        const notificationSelectors = [
+            '//*[contains(@text, "Notification")]',
+            '//*[contains(@text, "Benachrichtigung")]',
+            '//*[contains(@text, "Erlauben")]',
+            '//*[contains(@text, "Allow")]',
+            '//*[contains(@text, "Zulassen")]',
+            '//*[contains(@text, "OK")]'
+        ];
+        
+        for (const selector of notificationSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    const text = await element.getText();
+                    console.log(`🔔 Found notification option: "${text}"`);
+                    
+                    if (text.toLowerCase().includes('erlauben') || 
+                        text.toLowerCase().includes('zulassen') ||
+                        text.toLowerCase().includes('allow') ||
+                        text === 'OK') {
+                        await element.click();
+                        console.log('✅ Notification permissions granted');
+                        await driver.saveScreenshot('./test-results/screenshots/notification-permission-granted.png');
+                        await driver.pause(3000);
+                        return true;
+                    }
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('ℹ️ No notification permission dialog found');
+        return false;
+    }
+    
+    static async navigateWelcomeDialog() {
+        console.log('👋 Navigating through welcome dialog...');
+        
+        // Swipe left for 3 pages
+        for (let i = 1; i <= 3; i++) {
+            console.log(`📱 Swiping left (page ${i}/3)...`);
+            
+            const windowSize = await driver.getWindowSize();
+            const screenHeight = windowSize.height;
+            const screenWidth = windowSize.width;
+            
+            // Swipe left
+            await driver.performActions([{
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'touch' },
+                actions: [
+                    { type: 'pointerMove', duration: 0, x: screenWidth * 0.8, y: screenHeight * 0.5 },
+                    { type: 'pointerDown', button: 0 },
+                    { type: 'pointerMove', duration: 1000, x: screenWidth * 0.2, y: screenHeight * 0.5 },
+                    { type: 'pointerUp', button: 0 }
+                ]
+            }]);
+            
+            await driver.pause(2000);
+            await driver.saveScreenshot(`./test-results/screenshots/welcome-swipe-${i}.png`);
+        }
+        
+        // Look for close button (X)
+        console.log('❌ Looking for close button...');
+        
+        const closeSelectors = [
+            '//*[@content-desc="Close"]',
+            '//*[@content-desc="Schließen"]',
+            '//*[contains(@text, "X")]',
+            '//*[@content-desc="X"]',
+            '//android.widget.ImageButton[contains(@content-desc, "close")]',
+            '//android.widget.ImageButton[contains(@content-desc, "Close")]',
+            '//android.widget.Button[contains(@text, "X")]'
+        ];
+        
+        for (const selector of closeSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`❌ Found close button with selector: ${selector}`);
+                    await element.click();
+                    console.log('✅ Welcome dialog closed');
+                    await driver.saveScreenshot('./test-results/screenshots/welcome-dialog-closed.png');
+                    await driver.pause(3000);
+                    return true;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('⚠️ Close button not found, trying alternative methods...');
+        
+        // Try clicking at bottom center (where X might be)
+        const windowSize = await driver.getWindowSize();
+        await driver.performActions([{
+            type: 'pointer',
+            id: 'finger1',
+            parameters: { pointerType: 'touch' },
+            actions: [
+                { type: 'pointerMove', duration: 0, x: windowSize.width / 2, y: windowSize.height * 0.9 },
+                { type: 'pointerDown', button: 0 },
+                { type: 'pointerUp', button: 0 }
+            ]
+        }]);
+        
+        await driver.pause(3000);
+        console.log('✅ Welcome dialog navigation completed');
+        return false;
+    }
+    
+    static async openDeviceSettings() {
+        console.log('⚙️ Opening device settings...');
+        
+        const settingsSelectors = [
+            '//*[contains(@text, "Einstellungen")]',
+            '//*[contains(@text, "Settings")]',
+            '//*[contains(@content-desc, "Einstellungen")]',
+            '//*[contains(@content-desc, "Settings")]',
+            '//android.widget.ImageButton[contains(@content-desc, "settings")]',
+            '//android.widget.ImageButton[contains(@content-desc, "Settings")]'
+        ];
+        
+        for (const selector of settingsSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`⚙️ Found settings with selector: ${selector}`);
+                    await element.click();
+                    console.log('✅ Device settings opened');
+                    await driver.saveScreenshot('./test-results/screenshots/device-settings-opened.png');
+                    await driver.pause(3000);
+                    return true;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('⚠️ Settings button not found');
+        return false;
+    }
+    
+    static async openShowerSettings() {
+        console.log('🚿 Opening shower settings...');
+        
+        const showerSelectors = [
+            '//*[contains(@text, "Dusche")]',
+            '//*[contains(@text, "Shower")]',
+            '//*[contains(@text, "dusche")]',
+            '//*[contains(@text, "shower")]',
+            '//*[contains(@content-desc, "Dusche")]',
+            '//*[contains(@content-desc, "Shower")]'
+        ];
+        
+        for (const selector of showerSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`🚿 Found shower settings with selector: ${selector}`);
+                    await element.click();
+                    console.log('✅ Shower settings opened');
+                    await driver.saveScreenshot('./test-results/screenshots/shower-settings-opened.png');
+                    await driver.pause(3000);
+                    return true;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('⚠️ Shower settings not found');
+        return false;
+    }
+    
+    static async adjustWaterTemperature() {
+        console.log('🌡️ Adjusting water temperature...');
+        
+        const temperatureSelectors = [
+            '//*[contains(@text, "Temperatur")]',
+            '//*[contains(@text, "Temperature")]',
+            '//*[contains(@text, "°C")]',
+            '//*[contains(@content-desc, "Temperatur")]',
+            '//*[contains(@content-desc, "Temperature")]',
+            '//android.widget.SeekBar',
+            '//android.widget.ProgressBar'
+        ];
+        
+        let temperatureControl = null;
+        
+        for (const selector of temperatureSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`🌡️ Found temperature control with selector: ${selector}`);
+                    temperatureControl = element;
+                    break;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        if (temperatureControl) {
+            // Try to interact with the temperature control
+            try {
+                // Get element bounds for slider manipulation
+                const location = await temperatureControl.getLocation();
+                const size = await temperatureControl.getSize();
+                
+                // Calculate middle position of the slider
+                const centerX = location.x + size.width / 2;
+                const centerY = location.y + size.height / 2;
+                
+                console.log(`🌡️ Clicking on temperature control at (${centerX}, ${centerY})`);
+                
+                // Click on the middle of the temperature control
+                await driver.performActions([{
+                    type: 'pointer',
+                    id: 'finger1',
+                    parameters: { pointerType: 'touch' },
+                    actions: [
+                        { type: 'pointerMove', duration: 0, x: centerX, y: centerY },
+                        { type: 'pointerDown', button: 0 },
+                        { type: 'pointerUp', button: 0 }
+                    ]
+                }]);
+                
+                await driver.pause(2000);
+                console.log('✅ Water temperature adjusted to middle position');
+                await driver.saveScreenshot('./test-results/screenshots/water-temperature-adjusted.png');
+                return true;
+                
+            } catch (error) {
+                console.log(`⚠️ Could not interact with temperature control: ${error.message}`);
+            }
+        }
+        
+        // Alternative approach: Look for temperature values and click on a middle value
+        const temperatureValues = [
+            '//*[contains(@text, "37")]',
+            '//*[contains(@text, "38")]',
+            '//*[contains(@text, "36")]',
+            '//*[contains(@text, "39")]'
+        ];
+        
+        for (const selector of temperatureValues) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`🌡️ Found temperature value with selector: ${selector}`);
+                    await element.click();
+                    console.log('✅ Water temperature adjusted');
+                    await driver.saveScreenshot('./test-results/screenshots/water-temperature-set.png');
+                    await driver.pause(2000);
+                    return true;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('⚠️ Could not find temperature control');
+        return false;
+    }
+    
+    static async closeShowerSettings() {
+        console.log('🚿 Closing shower settings...');
+        return await this.navigateBack('shower settings');
+    }
+    
+    static async closeDeviceSettings() {
+        console.log('⚙️ Closing device settings...');
+        return await this.navigateBack('device settings');
+    }
+    
+    static async closeDeviceInfo() {
+        console.log('📱 Closing device info...');
+        return await this.navigateBack('device info');
+    }
+    
+    static async navigateBack(context = '') {
+        console.log(`🔙 Navigating back from ${context}...`);
+        
+        const backSelectors = [
+            '//*[@content-desc="Navigate up"]',
+            '//*[@content-desc="Back"]',
+            '//*[@content-desc="Zurück"]',
+            '//android.widget.ImageButton[@content-desc="Navigate up"]',
+            '//android.widget.ImageButton[@content-desc="Back"]',
+            '//*[contains(@content-desc, "back")]',
+            '//*[contains(@content-desc, "Back")]'
+        ];
+        
+        for (const selector of backSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`🔙 Found back button with selector: ${selector}`);
+                    await element.click();
+                    console.log(`✅ Navigated back from ${context}`);
+                    await driver.saveScreenshot(`./test-results/screenshots/navigated-back-from-${context.replace(/\s+/g, '-')}.png`);
+                    await driver.pause(2000);
+                    return true;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        // Fallback: Use Android back button
+        console.log('📱 Using Android back button as fallback...');
+        await driver.pressKeyCode(4); // Android back button
+        await driver.pause(2000);
+        console.log(`✅ Used Android back button to exit ${context}`);
+        return true;
+    }
+    
+    static async deactivateDemoModeViaSettings() {
+        console.log('🔄 Deactivating demo mode via device settings...');
+        
+        const demoModeSelectors = [
+            '//*[contains(@text, "Vorführmodus")]',
+            '//*[contains(@text, "Demo")]',
+            '//*[contains(@text, "demo")]',
+            '//*[contains(@text, "Demonstration")]',
+            '//*[contains(@content-desc, "Vorführmodus")]',
+            '//*[contains(@content-desc, "Demo")]'
+        ];
+        
+        for (const selector of demoModeSelectors) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    console.log(`🔄 Found demo mode setting with selector: ${selector}`);
+                    await element.click();
+                    await driver.pause(2000);
+                    
+                    // Handle potential confirmation
+                    const okButton = await this.findOkButton();
+                    if (okButton) {
+                        await okButton.click();
+                        await driver.pause(2000);
+                        console.log('🎯 Demo mode deactivation confirmed');
+                    }
+                    
+                    console.log('✅ Demo mode deactivated via settings');
+                    await driver.saveScreenshot('./test-results/screenshots/demo-mode-deactivated-via-settings.png');
+                    await driver.pause(3000);
+                    return true;
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('⚠️ Demo mode setting not found in device settings');
+        return false;
+    }
+    
+    static async verifyHomeScreen() {
+        console.log('🏠 Verifying return to Geberit Home screen...');
+        
+        const homeIndicators = [
+            '//*[contains(@text, "Geberit")]',
+            '//*[contains(@text, "Home")]',
+            '//*[contains(@text, "home")]',
+            '//*[contains(@content-desc, "Home")]'
+        ];
+        
+        for (const selector of homeIndicators) {
+            try {
+                const element = await $(selector);
+                if (await element.isExisting()) {
+                    const text = await element.getText();
+                    console.log(`🏠 Found home indicator: "${text}"`);
+                    
+                    if (text.toLowerCase().includes('geberit') || 
+                        text.toLowerCase().includes('home')) {
+                        console.log('✅ Successfully returned to Geberit Home screen');
+                        await driver.saveScreenshot('./test-results/screenshots/home-screen-verified.png');
+                        return true;
+                    }
+                }
+            } catch (error) {
+                // Continue searching
+            }
+        }
+        
+        console.log('⚠️ Could not verify home screen, but continuing...');
+        await driver.saveScreenshot('./test-results/screenshots/final-screen-state.png');
+        return false;
+    }
 }
 
 describe('Geberit Home - Complete Demo Mode Cycle', () => {
