@@ -79,7 +79,13 @@ describe('My Demo App - Complete E2E Shopping Journey', () => {
         // STEP 5: Authentication
         console.log('📱 Step 5: Authentication');
         
-        // Verify pre-filled credentials
+        // Click on the pre-configured user "bod@example.com" to auto-fill credentials
+        const predefinedUser = await $('//android.widget.TextView[@text="bod@example.com"]');
+        await predefinedUser.click();
+        await browser.pause(2000);
+        console.log('✅ Selected predefined user: bod@example.com');
+        
+        // Verify credentials are filled
         const usernameField = await $('//android.widget.EditText[@resource-id="com.saucelabs.mydemoapp.android:id/nameET"]');
         const passwordField = await $('//android.widget.EditText[@resource-id="com.saucelabs.mydemoapp.android:id/passwordET"]');
         
