@@ -2,7 +2,7 @@ exports.config = {
     runner: 'local',
     
     specs: [
-        './test/specs/geberit-home/demo-mode.spec.js'
+        'C:/git/swiss-testing-night-2025/mobile/test/specs/geberit-home/demo-mode.spec.js'
     ],
     
     capabilities: [{

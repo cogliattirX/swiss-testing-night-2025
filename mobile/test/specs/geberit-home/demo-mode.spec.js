@@ -195,64 +195,123 @@ describe('Geberit Home - Demo Mode Setup', () => {
             await driver.saveScreenshot('./test-results/screenshots/geberit-demo-ok-not-found.png');
         }
         
-        // Step 4: Wait for products to load (wait for 9 products)
+        // Step 4: Wait for products to load and scroll to find all 9 products
         console.log('⏳ Waiting for products to load...');
         await driver.pause(5000); // Give time for products to load
         
-        // Look for product elements
-        const productSelectors = [
-            '//android.widget.TextView[contains(@text, "Geberit")]',
-            '//android.widget.TextView[contains(@text, "AquaClean")]',
-            '//*[contains(@text, "Testset")]',
-            '//*[contains(@content-desc, "product")]',
-            '//*[contains(@content-desc, "Product")]',
-            '//android.widget.ImageView[@clickable="true"]',
-            '//android.widget.LinearLayout[@clickable="true"]',
-            '//android.widget.RelativeLayout[@clickable="true"]'
-        ];
+        // Function to get all visible products and their text
+        async function getAllVisibleProducts() {
+            const productSelectors = [
+                '//android.widget.TextView[contains(@text, "Geberit")]',
+                '//android.widget.TextView[contains(@text, "AquaClean")]',
+                '//*[contains(@text, "Testset")]'
+            ];
+            
+            let allProducts = [];
+            const productTexts = new Set(); // Use Set to avoid duplicates
+            
+            for (const selector of productSelectors) {
+                try {
+                    const elements = await $$(selector);
+                    for (const element of elements) {
+                        try {
+                            const text = await element.getText();
+                            if (text && !productTexts.has(text)) {
+                                productTexts.add(text);
+                                allProducts.push({
+                                    element: element,
+                                    text: text,
+                                    selector: selector
+                                });
+                            }
+                        } catch (e) {
+                            // Skip elements that can't be read
+                        }
+                    }
+                } catch (error) {
+                    // Skip failed selectors
+                }
+            }
+            
+            return allProducts;
+        }
         
-        let products = [];
+        // Get screen dimensions for scrolling
+        const windowSize = await driver.getWindowSize();
+        const screenHeight = windowSize.height;
+        const screenWidth = windowSize.width;
         
-        for (const selector of productSelectors) {
-            try {
-                console.log(`🔍 Looking for products with selector: ${selector}`);
-                const elements = await $$(selector);
-                if (elements.length > 0) {
-                    console.log(`📦 Found ${elements.length} potential product elements with selector: ${selector}`);
-                    products = elements;
+        console.log(`� Screen dimensions: ${screenWidth} x ${screenHeight}`);
+        
+        // Collect all products by scrolling through the screen
+        let allFoundProducts = [];
+        let scrollAttempts = 0;
+        const maxScrollAttempts = 5;
+        let previousProductCount = 0;
+        
+        console.log('� Starting product discovery with scrolling...');
+        
+        while (scrollAttempts < maxScrollAttempts) {
+            // Get currently visible products
+            const currentProducts = await getAllVisibleProducts();
+            
+            // Add new products to our collection
+            for (const product of currentProducts) {
+                const isAlreadyFound = allFoundProducts.some(p => p.text === product.text);
+                if (!isAlreadyFound) {
+                    allFoundProducts.push(product);
+                    console.log(`📦 Found new product: "${product.text}"`);
+                }
+            }
+            
+            console.log(`� Total unique products found so far: ${allFoundProducts.length}`);
+            
+            // Take screenshot of current view
+            await driver.saveScreenshot(`./test-results/screenshots/geberit-demo-scroll-${scrollAttempts + 1}.png`);
+            
+            // If we found 9 or more products, we're done
+            if (allFoundProducts.length >= 9) {
+                console.log('🎯 Found 9 or more products, stopping scroll search');
+                break;
+            }
+            
+            // If no new products found in this scroll, try one more scroll then break
+            if (allFoundProducts.length === previousProductCount) {
+                console.log('⚠️  No new products found in this scroll iteration');
+                if (scrollAttempts >= 2) {
+                    console.log('🛑 No new products found for 2+ scrolls, stopping search');
                     break;
                 }
-            } catch (error) {
-                console.log(`❌ Product selector failed: ${selector}`);
             }
-        }
-        
-        console.log(`📦 Total products found: ${products.length}`);
-        
-        // Wait for 9 products with timeout
-        const maxWaitTime = 30000; // 30 seconds
-        const startTime = Date.now();
-        
-        while (products.length < 9 && (Date.now() - startTime) < maxWaitTime) {
-            console.log(`⏳ Currently ${products.length} products, waiting for 9... (${Math.floor((Date.now() - startTime) / 1000)}s elapsed)`);
+            
+            previousProductCount = allFoundProducts.length;
+            
+            // Scroll down to reveal more products
+            console.log(`📜 Scrolling down (attempt ${scrollAttempts + 1})...`);
+            await driver.performActions([{
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'touch' },
+                actions: [
+                    { type: 'pointerMove', duration: 0, x: screenWidth / 2, y: screenHeight * 0.8 },
+                    { type: 'pointerDown', button: 0 },
+                    { type: 'pointerMove', duration: 1000, x: screenWidth / 2, y: screenHeight * 0.3 },
+                    { type: 'pointerUp', button: 0 }
+                ]
+            }]);
+            
+            // Wait for scroll animation and content to load
             await driver.pause(2000);
             
-            // Re-check products
-            try {
-                products = await $$('//android.widget.TextView[contains(@text, "Geberit")]');
-                if (products.length === 0) {
-                    products = await $$('//*[contains(@text, "Testset")]');
-                }
-                if (products.length === 0) {
-                    products = await $$('//android.widget.ImageView[@clickable="true"]');
-                }
-            } catch (error) {
-                console.log('Error re-checking products:', error.message);
-            }
+            scrollAttempts++;
         }
         
-        console.log(`📦 Final product count: ${products.length}`);
-        await driver.saveScreenshot('./test-results/screenshots/geberit-demo-05-products-loaded.png');
+        console.log(`📦 Final product discovery complete! Found ${allFoundProducts.length} unique products:`);
+        allFoundProducts.forEach((product, index) => {
+            console.log(`  ${index + 1}. "${product.text}"`);
+        });
+        
+        await driver.saveScreenshot('./test-results/screenshots/geberit-demo-05-all-products-found.png');
         
         // Step 5: Verify that "Testset Geberit AquaClean" is the first product
         console.log('🔍 Verifying first product is "Testset Geberit AquaClean"');
