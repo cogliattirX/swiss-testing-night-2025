@@ -18,7 +18,8 @@ test.describe('🔴 Geberit PE - VOLLSTÄNDIGER E2E Test mit roten Highlights', 
     console.log(`🔴 ${description}: ROTE MARKIERUNG und Klick auf ${selector}`);
     
     try {
-      // Add RED rectangle highlight before clicking
+      // Add RED rectangle highlight before         console.log(`\n⚠️ TEILWEISE ERFOLGREICH: Liste geöffnet, aber Schutzstopfen-Verifikation unvollständig`);
+        console.log(`📊 Score ${updatedVerificationScore}/6 - Schutzstopfen-Requirement nicht erfüllt`);icking
       await page.evaluate((sel) => {
         const element = document.querySelector(sel);
         if (element) {
@@ -333,7 +334,7 @@ test.describe('🔴 Geberit PE - VOLLSTÄNDIGER E2E Test mit roten Highlights', 
         }
       }
       
-      await actions.observableExpected(async () => {
+      await actions.observableExpect(async () => {
         expect(foundSchutzstopfen).toBe(true);
       }, `Verify Geberit Schutzstopfen found: ${schutzstopfenName}`);
       
@@ -731,7 +732,7 @@ test.describe('🔴 Geberit PE - VOLLSTÄNDIGER E2E Test mit roten Highlights', 
       
       const passedCriteria = verificationCriteria.filter(c => c.passed);
       const verificationScore = passedCriteria.length;
-      const isValidList = verificationScore >= 3;
+      let isValidList = verificationScore >= 3;
       
       console.log(`\n🔴 ═══ FINALE VERIFIKATIONS-ANALYSE ═══`);
       
@@ -786,7 +787,7 @@ test.describe('🔴 Geberit PE - VOLLSTÄNDIGER E2E Test mit roten Highlights', 
       console.log(`   ✅ Schutzstopfen gefunden: ${schutzstopfenFound ? 'JA' : 'NEIN'}`);
       
       // Update verification criteria with Schutzstopfen check
-      const verificationCriteria = [
+      const updatedVerificationCriteria = [
         { name: 'Listen-Struktur', passed: hasValidListStructure, details: `${foundListIndicators.length} Indikatoren` },
         { name: 'Produkt-Content', passed: hasProductContent, details: `${foundIndicators.length} Indikatoren, ${totalProductMentions} Erwähnungen` },
         { name: 'Listen-Elemente', passed: hasListElements, details: `${totalListElements} Elemente` },
@@ -795,16 +796,16 @@ test.describe('🔴 Geberit PE - VOLLSTÄNDIGER E2E Test mit roten Highlights', 
         { name: 'URL-Validität', passed: hasValidUrl, details: currentUrl }
       ];
       
-      const passedCriteria = verificationCriteria.filter(c => c.passed);
-      const verificationScore = passedCriteria.length;
-      const isValidList = verificationScore >= 4 && schutzstopfenFound; // Require Schutzstopfen found
+      const updatedPassedCriteria = updatedVerificationCriteria.filter(c => c.passed);
+      const updatedVerificationScore = updatedPassedCriteria.length;
+      isValidList = updatedVerificationScore >= 4 && schutzstopfenFound; // Require Schutzstopfen found
       
-      verificationCriteria.forEach(criteria => {
+      updatedVerificationCriteria.forEach(criteria => {
         const status = criteria.passed ? '✅' : '❌';
         const highlight = criteria.name.includes('SCHUTZSTOPFEN') ? '🔴 ' : '';
         console.log(`   ${highlight}${status} ${criteria.name}: ${criteria.details}`);
       });
-      console.log(`📊 VERIFIKATIONS-SCORE: ${verificationScore}/6`);
+      console.log(`📊 VERIFIKATIONS-SCORE: ${updatedVerificationScore}/6`);
       console.log(`🏆 GESAMTERGEBNIS: ${isValidList ? 'BESTANDEN' : 'SCHUTZSTOPFEN NICHT VERIFIZIERT'}`);
       
       if (isValidList && schutzstopfenFound) {
