@@ -16,12 +16,13 @@ const config = {
         'appium:deviceName': 'Android Emulator',
         'appium:newCommandTimeout': 240,
         
-        // App-specific capabilities for Geberit Home
+        // App-specific capabilities for Geberit Home (using already running app)
         'appium:appPackage': 'com.geberit.home',
-        'appium:appActivity': '.MainActivity', // Will be detected dynamically
+        'appium:appActivity': '.MainActivity',
         'appium:autoGrantPermissions': true,
-        'appium:noReset': false,
-        'appium:fullReset': false
+        'appium:noReset': true,  // Don't reset app - use already running instance
+        'appium:fullReset': false,
+        'appium:dontStopAppOnReset': true  // Keep app running
     }],
     
     logLevel: 'info',
@@ -62,6 +63,11 @@ const config = {
     
     // No Appium service - using external Appium server
     services: [],
+    
+    // Add Appium server configuration
+    hostname: 'localhost',
+    port: 4723,
+    path: '/',
     
     reporters: ['spec']
 };

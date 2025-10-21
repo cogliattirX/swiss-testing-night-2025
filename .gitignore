@@ -1,3 +1,6 @@
 mobile/node_modules/.bin/
 mobile/node_modules/
 run/node_modules/
+config/wdio.geberit.js/node_modules/
+config/wdio.geberit-complete.js/node_modules/.bin/esparse.ps1
+config/wdio.geberit-complete.js/node_modules/
